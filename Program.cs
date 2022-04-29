@@ -11,17 +11,17 @@ namespace TestDocumentManager
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Azure Blob Storage!");
-
-            Uri accountUri = new Uri("https://p01d12202014001.blob.core.windows.net/");
+            string storageAccountName = "<storage account name>";
+            Uri accountUri = new Uri($"https://{storageAccountName}.blob.core.windows.net/");
             try
             {
                 switch (args[0])
                 {
                     case "UPN":
-                        ManageBlobsWithUPN(accountUri, "nslsc");
+                        ManageBlobsWithUPN(accountUri, "nslsc", storageAccountName);
                         break;
                     case "KEY":
-                        ManageBlobsWithKey(accountUri, "cal");
+                        ManageBlobsWithKey(accountUri, "cal", storageAccountName);
                         break;
                 }
             }
@@ -32,7 +32,7 @@ namespace TestDocumentManager
             Console.ReadLine();
         }
 
-        static void ManageBlobsWithUPN(Uri storageAccountUri, string lob)
+        static void ManageBlobsWithUPN(Uri storageAccountUri, string lob, string storageAccount)
         {
             var credential = new DefaultAzureCredential(includeInteractiveCredentials: true);
             var token = credential.GetToken(
@@ -43,7 +43,7 @@ namespace TestDocumentManager
 
             BlobServiceClient client = new BlobServiceClient(storageAccountUri, credential);
 
-            var blobContainerUri = new Uri($"https://p01d12202014001.blob.core.windows.net/{lob}");
+            var blobContainerUri = new Uri($"https://{storageAccount}.blob.core.windows.net/{lob}");
             BlobContainerClient container = new BlobContainerClient(blobContainerUri, credential);
 
             Console.WriteLine("=== List of current blobs ===");
@@ -66,12 +66,13 @@ namespace TestDocumentManager
             return;
         }
 
-        static void ManageBlobsWithKey(Uri storageAccountUri,string lob)
+        static void ManageBlobsWithKey(Uri storageAccountUri,string lob,string storageAccount)
         {
             BlobServiceClient client = new BlobServiceClient(storageAccountUri);
 
             // Get a connection string to our Azure Storage account.
-            string connectionString = "DefaultEndpointsProtocol=https;AccountName=p01d12202014001;AccountKey=y3bJ0P/HVYhWjQKTJypjedeJsSmFRAtiyhsUumUkN3VhA81g2QSUIMW0mlEe4vRIc4VK60MvzBKiwCDZZmgayg==;EndpointSuffix=core.windows.net";
+            string secret = "<secret key>";
+            string connectionString = $"DefaultEndpointsProtocol=https;AccountName={storageAccount};AccountKey={secret};EndpointSuffix=core.windows.net";
             string containerName = lob;
 
             BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
